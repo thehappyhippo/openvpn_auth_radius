@@ -30,6 +30,9 @@
 class AuthenticationProcess {
 public:
 	void Authentication(PluginContext *);
+
+private:
+	bool running;
 };
 
 #endif //_AUTHENTICATIONPROCESS_H_
