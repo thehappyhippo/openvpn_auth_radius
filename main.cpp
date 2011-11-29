@@ -58,7 +58,7 @@ int main(void) {
 	env[9] = NULL;
 	
 	argv[0] = "radiusplugin.so";
-	argv[1] = "./radiusplugin.cnf";
+	argv[1] = "./auth-radius.conf";
 	argv[2] = NULL;
 
 	context = openvpn_plugin_open_v2(&type_mask, (const char **) argv, (const char **) env, NULL);

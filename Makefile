@@ -15,7 +15,7 @@ LIBS=-lgcrypt -lpthread
 CFLAGS=-Wall -shared -fPIC -DPIC
 
 
-PLUGIN=radiusplugin.so
+PLUGIN=openvpn-auth-radius.so
 
 OBJECTS=\
   RadiusClass/RadiusAttribute.o \
