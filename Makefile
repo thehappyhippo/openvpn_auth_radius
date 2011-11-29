@@ -56,5 +56,8 @@ clean:
 distclean: clean
 	find ./ -name "*~" -exec rm -rf {} \;
 	find ./ -name "*.kdev*" -exec rm -rf {} \;
+	rm -rf Debug
+	rm -rf doc/latex
+	rm -rf doc/html
 	rm -f acf*
 	rm -f main
