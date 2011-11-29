@@ -19,26 +19,9 @@
  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include <sstream>
+
 #include "Config.h"
-
-/** The constructor The constructor initializes all char arrays with 0.
- */
-
-Config::Config(void) {
-	
-	this->usernameascommonname = false;
-	this->clientcertnotrequired = false;
-	this->overwriteccfiles = true;
-	this->useauthcontrolfile = false;
-	this->accountingonly = false;
-	this->nonfatalaccounting = false;
-	this->ccdPath = "";
-	this->openvpnconfig = "";
-	this->vsanamedpipe = "";
-	this->vsascript = "";
-	memset(this->subnet, 0, 16);
-	memset(this->p2p, 0, 16);
-}
 
 /** The constructor initializes all char arrays with 0. After the initialization
  * the configfile is parsed and the information which are
@@ -46,21 +29,22 @@ Config::Config(void) {
  * @param configfile The name of the configfile.
  */
 
-Config::Config(char * configfile) {
-	memset(this->subnet, 0, 16);
-	memset(this->p2p, 0, 16);
-	this->ccdPath = "";
-	this->openvpnconfig = "";
-	this->vsanamedpipe = "";
-	this->vsascript = "";
+Config::Config(char* configfile) {
 	this->usernameascommonname = false;
 	this->clientcertnotrequired = false;
 	this->overwriteccfiles = true;
 	this->useauthcontrolfile = false;
 	this->accountingonly = false;
 	this->nonfatalaccounting = false;
-	this->parseConfigFile(configfile);
+	this->ccdPath = "";
+	this->openvpnconfig = "";
+	this->vsanamedpipe = "";
+	this->vsascript = "";
+	memset(this->subnet, 0, 16);
+	memset(this->p2p, 0, 16);
 	
+	if(configfile)
+		this->parseConfigFile(configfile);
 }
 
 /** The destructur clears the serverlist. */
@@ -89,26 +73,18 @@ int Config::parseConfigFile(const char * configfile) {
 						return BAD_FILE;
 					}
 					line.copy(this->subnet, line.size() - 7, 7);
-					
-				}
-				if (strncmp(line.c_str(), "p2p=", 4) == 0) {
+				} else if (strncmp(line.c_str(), "p2p=", 4) == 0) {
 					if ((line.size() - 4) > 15) {
 						return BAD_FILE;
 					}
 					line.copy(this->p2p, line.size() - 4, 4);
-				}
-				if (strncmp(line.c_str(), "vsascript=", 10) == 0) {
+				} else if (strncmp(line.c_str(), "vsascript=", 10) == 0) {
 					this->vsascript = line.substr(10, line.size() - 10);
-				}
-				if (strncmp(line.c_str(), "vsanamedpipe=", 13) == 0) {
+				} else if (strncmp(line.c_str(), "vsanamedpipe=", 13) == 0) {
 					this->vsanamedpipe = line.substr(13, line.size() - 13);
-				}
-
-				if (strncmp(line.c_str(), "OpenVPNConfig=", 14) == 0) {
+				} else if (strncmp(line.c_str(), "OpenVPNConfig=", 14) == 0) {
 					this->openvpnconfig = line.substr(14, line.size() - 14);
-				}
-				if (strncmp(line.c_str(), "overwriteccfiles=", 17) == 0) {
-					
+				} else if (strncmp(line.c_str(), "overwriteccfiles=", 17) == 0) {
 					string stmp = line.substr(17, line.size() - 17);
 					deletechars(&stmp);
 					if (stmp == "true")
@@ -117,10 +93,7 @@ int Config::parseConfigFile(const char * configfile) {
 						this->overwriteccfiles = false;
 					else
 						return BAD_FILE;
-
-				}
-				if (strncmp(line.c_str(), "useauthcontrolfile=", 19) == 0) {
-					
+				} else if (strncmp(line.c_str(), "useauthcontrolfile=", 19) == 0) {
 					string stmp = line.substr(19, line.size() - 19);
 					deletechars(&stmp);
 					if (stmp == "true")
@@ -129,10 +102,7 @@ int Config::parseConfigFile(const char * configfile) {
 						this->useauthcontrolfile = false;
 					else
 						return BAD_FILE;
-
-				}
-				if (strncmp(line.c_str(), "accountingonly=", 15) == 0) {
-					
+				} else if (strncmp(line.c_str(), "accountingonly=", 15) == 0) {
 					string stmp = line.substr(15, line.size() - 15);
 					deletechars(&stmp);
 					if (stmp == "true")
@@ -141,10 +111,7 @@ int Config::parseConfigFile(const char * configfile) {
 						this->accountingonly = false;
 					else
 						return BAD_FILE;
-
-				}
-				if (strncmp(line.c_str(), "nonfatalaccounting=", 19) == 0) {
-					
+				} else if (strncmp(line.c_str(), "nonfatalaccounting=", 19) == 0) {
 					string stmp = line.substr(19, line.size() - 19);
 					deletechars(&stmp);
 					if (stmp == "true")
@@ -153,17 +120,19 @@ int Config::parseConfigFile(const char * configfile) {
 						this->nonfatalaccounting = false;
 					else
 						return BAD_FILE;
-
+				} else if (strncmp(line.c_str(), "classlist=", 10) == 0) {
+					this->setClassList(line.substr(10, line.size() - 10));
 				}
 			}
-			
 		}
 		file.close();
+
 		// if the main files contains references to other config files
 		// we don't need to care about recursive includes, OpenVPN does it already
 		list<string> configfiles;
 		configfiles.push_back(this->openvpnconfig);
-		//open OpenVPN config
+
+		// open OpenVPN config
 		while (configfiles.size() > 0) {
 			ifstream file2;
 			string filename = configfiles.front();
@@ -175,6 +144,7 @@ int Config::parseConfigFile(const char * configfile) {
 
 					if (line.empty() == false) {
 						string param = line;
+
 						// trim leading whitespace
 						string::size_type pos = param.find_first_not_of(delims);
 						if (pos != string::npos)
@@ -468,3 +438,18 @@ bool Config::getNonFatalAccounting(void) {
 void Config::setNonFatalAccounting(bool b) {
 	this->nonfatalaccounting = b;
 }
+
+list<string> Config::getClassList() {
+	return this->classList;
+}
+
+void Config::setClassList(string list) {
+	std::stringstream ss(list);
+	std::string item;
+
+	this->classList.clear();
+	while(std::getline(ss, item, ',')) {
+		this->classList.push_back(item);
+	}
+}
+

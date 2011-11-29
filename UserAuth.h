@@ -40,22 +40,61 @@ using namespace std;
 
 /**The class represents an user for the authentication process.**/
 class UserAuth: public User {
-private:
-	string password; /**<The password of the user.*/
-
 public:
+	UserAuth() : User() { };
+	~UserAuth() {};
 
-	string getPassword(void);
-	void setPassword(string);
+	/** The getter method for the password.
+	 * @return The password as a string.
+	 */
+	string getPassword(void) { return this->password; };
 
-	UserAuth();
-	~UserAuth();
+	/**The setter method for the password.
+	 * @param passwd The password.
+	 */
+	void setPassword(string passwd) { this->password = passwd; };
 
+	string getClass(void) { return this->klass; };
+
+	void setClass(string cls) { this->klass = cls; };
+
+	/**The method send an authentication packet to the radius server and
+	 * calls the method parseResponsePacket(). The following attributes are in the packet:
+	 * - User_Name,
+	 * - User_Password
+	 * - NAS_PortCalling_Station_Id,
+	 * - NAS_Identifier,
+	 * - NAS_IP_Address,
+	 * - NAS_Port_Type
+	 * - Service_Type.
+	 * @param context The context of the background process.
+	 * @return An integer, 0 if the authentication succeded, else 1.*/
 	int sendAcceptRequestPacket(PluginContext *);
-	void parseResponsePacket(RadiusPacket *, PluginContext *);
+
+	/** The method creates the client config file in the client config dir (ccd).
+	 * The path is set in the radiusplugin config file.
+	 * Radius attributes which written to the file are FramedIP as ifconfig-push option and FramedRoutes as iroute option.
+	 * TODO: not IPv6 ready
+	 * @param context : The plugin context.
+	 * @return An integer, if everything is ok 0, else 1.
+	 */
 	int createCcdFile(PluginContext *);
-	string valueToString(RadiusVendorSpecificAttribute *);
-	
+
+private:
+	/** The password of the user.*/
+	string password;
+
+	/** The classes of the user as returned by the server */
+	string klass;
+
+	/** The method parse the authentication response packet for
+	 * the attributes framed ip, framed routes and accinteriminterval
+	 * and saves the values in the UserAuth object. The there is no acctinteriminterval
+	 * it is set to 0.
+	 * @param packet A pointer to the radius packet to parse.
+	 * @param context The plugin context.
+	 */
+	void parseResponsePacket(RadiusPacket *, PluginContext *);
 };
 
 #endif //_USER_CONTEXT_AUTH_H_

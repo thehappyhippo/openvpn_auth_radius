@@ -36,26 +36,8 @@ using namespace std;
  * can set in the configuration file and methods for the attributes.
  */
 class Config {
-private:
-	
-	string ccdPath; /**<The client config dir, where the plugin writes the config informations (framed routes & ip address of the client)*/
-	string statusfile; /**< The path and filename of the status file, where openvpn writes the status information.*/
-	char subnet[16]; /**<The subnet which is assigned to the client in topology option.*/
-	char p2p[16]; /**<The OpenVPN server address which is assigned to the client in topology p2p.*/
-	string vsascript; /**<A script whcih handles vendor specific attributes.*/
-	string vsanamedpipe; /**<The named pipe to the vsascript.*/
-	bool usernameascommonname; /**<Use the username as commonname in the plugin (for OpenVPN option username-as-common-name (no commonname in the enviroment!)).*/
-	bool clientcertnotrequired; /**<For OpenVPN option client_cert_not_required, commonname = UNDEF.*/
-	string openvpnconfig; /**<Path to OpenVPN config.*/
-	bool overwriteccfiles; /**<If true the plugin overwrites the client config files.*/
-	bool useauthcontrolfile; /**<If true and the OpenVPN version supports auth control files, the acf is used.*/
-	bool accountingonly; /**<Only the accounting is done by the plugin.*/
-	bool nonfatalaccounting; /**<If errors during the accounting occurs, the users can still connect.*/
-	void deletechars(string *);
-
 public:
-	Config(void);
-	Config(char * configfile);
+	Config(char* configfile = NULL);
 	~Config();
 
 	int parseConfigFile(const char * configfile);
@@ -100,6 +82,55 @@ public:
 
 	string getOpenVPNConfig(void);
 	void setOpenVPNConfig(string);
+
+	list<string> getClassList(void);
+	void setClassList(string);
+
+private:
+	/** The client config dir, where the plugin writes the config informations (framed routes & ip address of the client)*/
+	string ccdPath;
+
+	/** The path and filename of the status file, where openvpn writes the status information.*/
+	string statusfile;
+
+	/** The subnet which is assigned to the client in topology option.*/
+	char subnet[16];
+
+	/** The OpenVPN server address which is assigned to the client in topology p2p.*/
+	char p2p[16];
+
+	/** A script whcih handles vendor specific attributes.*/
+	string vsascript;
+
+	/** The named pipe to the vsascript.*/
+	string vsanamedpipe;
+
+	/** Use the username as commonname in the plugin (for OpenVPN option username-as-common-name (no commonname in the enviroment!)).*/
+	bool usernameascommonname;
+
+	/** For OpenVPN option client_cert_not_required, commonname = UNDEF.*/
+	bool clientcertnotrequired;
+
+	/** Path to OpenVPN config.*/
+	string openvpnconfig;
+
+	/** If true the plugin overwrites the client config files.*/
+	bool overwriteccfiles;
+
+	/** If true and the OpenVPN version supports auth control files, the acf is used.*/
+	bool useauthcontrolfile;
+
+	/** Only the accounting is done by the plugin.*/
+	bool accountingonly;
+
+	/** If errors during the accounting occurs, the users can still connect.*/
+	bool nonfatalaccounting;
+
+	/** Comma-separated list of valid Class values */
+	list<string> classList;
+
+	/** */
+	void deletechars(string *);
 };
 
 #endif //_CONFIG_H_
