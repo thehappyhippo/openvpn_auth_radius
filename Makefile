@@ -51,4 +51,10 @@ test: $(OBJECTS)
 	@$(CC) -Wall $(OBJECTS) -o main $(LDFLAGS) $(LIBS)
 
 clean:
-	-rm $(PLUGIN) *.o */*.o
+	-rm -f $(PLUGIN) *.o */*.o
+
+distclean: clean
+	find ./ -name "*~" -exec rm -rf {} \;
+	find ./ -name "*.kdev*" -exec rm -rf {} \;
+	rm -f acf*
+	rm -f main
