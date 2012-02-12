@@ -1,0 +1,7 @@
+.o
+.so
+
+Debug/
+doc/latex/
+main
+radiusplugin.tag

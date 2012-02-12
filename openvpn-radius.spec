@@ -1,7 +1,7 @@
 Name:           openvpn-auth-radius
 Version:        2.1
 Release:        1%{?dist}
-Summary:        OepnVPN plugin for RADIUS
+Summary:        OpenVPN plugin for RADIUS
 
 Group:          Networking/Other
 License:        GPL
