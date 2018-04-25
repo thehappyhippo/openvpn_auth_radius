@@ -959,7 +959,7 @@ void get_user_env(PluginContext * context, const int type, const char * envp[], 
 	} else if (get_env("untrusted_ip", envp) == NULL && get_env("untrusted_ip6", envp) == NULL) {
 		throw Exception("RADIUS-PLUGIN: FOREGROUND: untrusted_ip and untrusted_ip6 is not defined\n");
 
-	} else if (get_env("common_name", envp) == NULL) {
+	} else if (get_env("common_name", envp) == NULL && context->conf.getUsernameAsCommonname() == false) {
 		if (context->conf.getClientCertNotRequired() == false) {
 			throw Exception("RADIUS-PLUGIN: FOREGROUND: common_name is not defined\n");
 		}
